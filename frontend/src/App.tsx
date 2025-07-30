@@ -58,8 +58,11 @@ function App() {
             </div>
           </div>
           <div className="w-4/5 ml-4">
-            {selectedCollectionId && (
-              <CompanyTable selectedCollectionId={selectedCollectionId} />
+            {selectedCollectionId && collectionResponse && (
+              <CompanyTable 
+                selectedCollectionId={selectedCollectionId} 
+                collections={collectionResponse}
+              />
             )}
           </div>
         </div>
