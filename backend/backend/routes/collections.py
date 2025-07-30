@@ -77,12 +77,11 @@ def get_company_collection_by_id(
         db.query(database.CompanyCollectionAssociation, database.Company)
         .join(database.Company)
         .filter(database.CompanyCollectionAssociation.collection_id == collection_id)
-        .order_by(database.Company.id)
     )
 
     total_count = query.with_entities(func.count()).scalar()
 
-    results = query.offset(offset).limit(limit).all()
+    results = query.order_by(database.Company.id).offset(offset).limit(limit).all()
     companies = fetch_companies_with_liked(db, [company.id for _, company in results])
 
     return CompanyCollectionOutput(
