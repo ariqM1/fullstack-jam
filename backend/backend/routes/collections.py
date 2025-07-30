@@ -77,6 +77,7 @@ def get_company_collection_by_id(
         db.query(database.CompanyCollectionAssociation, database.Company)
         .join(database.Company)
         .filter(database.CompanyCollectionAssociation.collection_id == collection_id)
+        .order_by(database.Company.id)
     )
 
     total_count = query.with_entities(func.count()).scalar()
