@@ -1,0 +1,86 @@
+DEVELOPER IMPLEMENTATION SUMMARY: COMPANY LIST MANAGEMENT
+
+✅ BACKEND (FastAPI / Python)
+
+🔌 New API Endpoints
+
+1. Add Selected Companies
+   POST /collections/{source_collection_id}/add-to/{target_collection_id}
+   Payload:
+   {
+     "company_ids": [1, 2, 3]
+   }
+   Response:
+   {
+     "operation_id": "abc123"
+   }
+
+2. Add All Companies
+   POST /collections/{source_collection_id}/add-all-to/{target_collection_id}
+   No payload
+   Response:
+   {
+     "operation_id": "def456"
+   }
+
+3. Check Operation Status
+   GET /collections/operations/{operation_id}
+   Response:
+   {
+     "status": "in_progress",
+     "processed": 1350,
+     "total": 50000,
+     "error": null
+   }
+
+⚙️ Background Processing
+
+- Uses BackgroundTasks to prevent blocking for large inserts (~100ms throttle per insert).
+- Duplicate entries are skipped.
+- Operation state: pending, in_progress, completed, failed.
+- Tracks progress (insert count vs. total).
+- Stored and updated in DB for status polling.
+
+🧱 Backend File Changes
+
+- backend/backend/routes/collections.py  
+  → Added endpoints + background task logic
+
+✅ FRONTEND (React / TypeScript)
+
+🧩 Component Enhancements: CompanyTable.tsx
+
+- Added:
+  - Checkbox-based company selection
+  - "Add Selected" and "Add All" buttons
+  - Target collection dropdown selector
+  - Linear progress bar for operation tracking
+  - Error display and notifications
+- Table auto-refreshes on operation completion.
+- Buttons are disabled during ongoing operations.
+
+🔌 API Integration: jam-api.ts
+
+- addCompaniesToCollection(sourceId, targetId, companyIds)
+- addAllCompaniesToCollection(sourceId, targetId)
+- getOperationStatus(operationId)
+
+Includes relevant TypeScript interfaces.
+
+📂 Other Changes
+
+- App.tsx – ensures company/collection data is passed into CompanyTable.
+
+🔍 DEV NOTES
+
+- Frontend polls /operations/{operation_id} every 1s during operations.
+- All insertions honor DB throttling (100ms delay each).
+- Duplicate company IDs are filtered before DB call.
+- Estimated time for 50k companies: ~1.4 hours.
+- All new endpoints tested with Dockerized backend.
+
+🚧 Future Dev Considerations
+- Switch polling to WebSocket for real-time updates
+- Batch inserts to speed up backend processing
+- Add undo or bulk-delete operations
+- Persist operation history/logs in backend
